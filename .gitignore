@@ -1,0 +1,18 @@
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+.env
+kaggle.json
+
+data/raw/
+data/processed/
+outputs/models/*.pt
+outputs/models/*.pth
+
+.DS_Store
+
+# local working notes (not part of the project)
+PROJECT_STATE.md
+RESUME_HERE.md
+outputs/models/*.pt
