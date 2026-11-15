@@ -1,5 +1,7 @@
 # Explainable Chest X-ray Pneumonia Detection
 
+[![CI](https://github.com/mobasunyayed-cell/chest-xray-pneumonia-gradcam/actions/workflows/ci.yml/badge.svg)](https://github.com/mobasunyayed-cell/chest-xray-pneumonia-gradcam/actions/workflows/ci.yml) [![CodeQL](https://github.com/mobasunyayed-cell/chest-xray-pneumonia-gradcam/actions/workflows/codeql.yml/badge.svg)](https://github.com/mobasunyayed-cell/chest-xray-pneumonia-gradcam/actions/workflows/codeql.yml)
+
 A PyTorch pipeline that classifies pediatric chest X-rays as **NORMAL vs PNEUMONIA** with a DenseNet121 and explains each prediction with **Grad-CAM** heatmaps. The focus is on an honest evaluation: patient-level splits, a threshold chosen on validation data only, an external test set, and a check for shortcut learning.
 
 > **Disclaimer:** research / educational project. Not a medical device and not for clinical use.
@@ -133,11 +135,15 @@ Tests cover patient-id parsing, patient-level split (no leakage, proportions, re
 
 ```
 src/        config, data, model, train, evaluate, gradcam, shortcut_check
+api/        FastAPI inference service (main, service, settings)
 app/        demo.py (Gradio)
 notebooks/  01_data_eda.ipynb, 02_run_on_kaggle.ipynb
 tests/      pytest suite
 docs/       figures
+Dockerfile, docker-compose.yml   container for the API
 ```
+
+See also [SECURITY.md](SECURITY.md), [CONTRIBUTING.md](CONTRIBUTING.md) and [CHANGELOG.md](CHANGELOG.md).
 
 ## Data and credit
 

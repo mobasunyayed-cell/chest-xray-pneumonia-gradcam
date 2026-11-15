@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Explainable chest X-ray pneumonia detection with an inference API"
+type: software
+version: 0.2.0
+date-released: 2026-11-15
+license: MIT
+repository-code: "https://github.com/mobasunyayed-cell/chest-xray-pneumonia-gradcam"
+authors:
+  - family-names: Abdo
+    given-names: Mohamed Basuny
