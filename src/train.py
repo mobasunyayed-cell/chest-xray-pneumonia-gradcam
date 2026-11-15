@@ -68,6 +68,13 @@ def plot_history(hist: pd.DataFrame, path) -> None:
     fig.tight_layout(); fig.savefig(path, dpi=150); plt.close(fig)
 
 
+def attach_metadata(ckpt, threshold: float) -> None:
+    """Add the validation-chosen threshold (and seed, classes) to a saved checkpoint."""
+    saved = torch.load(ckpt, map_location="cpu")
+    saved.update(threshold=float(threshold), seed=CFG.seed, classes=list(CFG.classes))
+    torch.save(saved, ckpt)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--epochs", type=int, default=CFG.epochs)
@@ -130,6 +137,8 @@ def main():
     model.load_state_dict(torch.load(ckpt, map_location=device)["model"])
     yv, pv = predict(model, loaders["val"], device)
     thr = best_threshold(yv, pv)  # chosen on VAL only, then applied to test/external
+    # Store the validation-chosen threshold next to the weights so the API uses the same one.
+    attach_metadata(ckpt, thr)
     table = evaluate_all(model, loaders, device, thr)
     print(f"\nthreshold from val (Youden J): {thr:.4f}\n")
     print(table.to_string())
