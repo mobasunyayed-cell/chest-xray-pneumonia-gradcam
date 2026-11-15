@@ -1,0 +1,7 @@
+split,variant,accuracy,sensitivity,specificity,auroc,fp,fn
+test,original,0.9869,0.9825,1.0,0.9996,0,10
+test,corners_masked,0.9869,0.9913,0.974,0.9989,5,5
+test,border_masked,0.8338,1.0,0.3385,0.9963,127,0
+external,original,0.8942,0.9974,0.7222,0.979,65,1
+external,corners_masked,0.851,0.9974,0.6068,0.9791,92,1
+external,border_masked,0.6474,1.0,0.0598,0.9355,220,0

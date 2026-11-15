@@ -23,7 +23,13 @@ Confusion counts (TN / FP / FN / TP): val 187 / 2 / 7 / 555, test 192 / 0 / 10 /
 - The *external* split is the original Kaggle test folder, which is distributed differently. It is the more honest estimate of generalisation: ranking quality stays high (AUROC 0.979) but the operating point shifts: 65 of 234 normal images are flagged as pneumonia at the validation-chosen threshold.
 - All data are pediatric (ages 1 to 5). Results do not transfer to adults.
 
-Figures (add after running): `docs/figures/roc.png`, `confusion.png`, `history.png`, `gradcam_test.png`, `gradcam_external.png`.
+**Reproducibility:** the whole pipeline was re-run from scratch on Kaggle (same seed 42) and gave the same threshold (0.2901) and identical confusion counts to the table above. Raw numbers are in [`docs/metrics.json`](docs/metrics.json) and [`docs/shortcut_check.csv`](docs/shortcut_check.csv).
+
+| ROC | Confusion matrices | Training history |
+|---|---|---|
+| ![ROC](docs/figures/roc.png) | ![Confusion](docs/figures/confusion.png) | ![History](docs/figures/history.png) |
+
+Grad-CAM galleries (rows: true positives, true negatives, false positives, false negatives; the false-positive row is empty on the test split because it has none): [test](docs/figures/gradcam_test.png), [external](docs/figures/gradcam_external.png). In the true-positive rows the heat sits over the lung fields. Some correct-negative images show a hot spot at the image edge, which is what the shortcut check below investigates.
 
 ## Method
 

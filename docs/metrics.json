@@ -1,0 +1,44 @@
+{
+  "val": {
+    "threshold": 0.2901,
+    "accuracy": 0.988,
+    "sensitivity": 0.9875,
+    "specificity": 0.9894,
+    "precision": 0.9964,
+    "f1": 0.992,
+    "auroc": 0.9987,
+    "auprc": 0.9996,
+    "tn": 187,
+    "fp": 2,
+    "fn": 7,
+    "tp": 555
+  },
+  "test": {
+    "threshold": 0.2901,
+    "accuracy": 0.9869,
+    "sensitivity": 0.9825,
+    "specificity": 1.0,
+    "precision": 1.0,
+    "f1": 0.9912,
+    "auroc": 0.9996,
+    "auprc": 0.9999,
+    "tn": 192,
+    "fp": 0,
+    "fn": 10,
+    "tp": 562
+  },
+  "external": {
+    "threshold": 0.2901,
+    "accuracy": 0.8942,
+    "sensitivity": 0.9974,
+    "specificity": 0.7222,
+    "precision": 0.8568,
+    "f1": 0.9218,
+    "auroc": 0.979,
+    "auprc": 0.9831,
+    "tn": 169,
+    "fp": 65,
+    "fn": 1,
+    "tp": 389
+  }
+}
