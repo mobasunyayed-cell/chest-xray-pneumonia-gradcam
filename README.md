@@ -72,10 +72,49 @@ python app/demo.py                 # Gradio demo (add --share for a public link)
 ```
 Dataset: add Kaggle's *Chest X-Ray Images (Pneumonia)* by Paul Mooney as notebook input. `notebooks/02_run_on_kaggle.ipynb` writes all source files and runs the steps in order.
 
+## Inference API
+
+A FastAPI service wraps the trained model so other programs can use it.
+
+```bash
+pip install -r requirements-api.txt
+export CXR_CHECKPOINT=outputs/models/best.pt   # the file written by training
+export CXR_THRESHOLD=0.2901                    # the validation-chosen threshold (see Results)
+uvicorn api.main:create_app --factory --port 8000
+```
+
+Interactive docs are at http://localhost:8000/docs.
+
+```bash
+curl -F "file=@xray.jpg" "http://localhost:8000/predict?explain=true"
+```
+
+```json
+{"label": "PNEUMONIA", "probability": 0.93, "threshold": 0.2901,
+ "heatmap_png_base64": "iVBOR...", "disclaimer": "Research demo, not a medical device. ..."}
+```
+
+| Endpoint | What it does |
+|---|---|
+| `GET /health` | Liveness, and whether a model is loaded. Always public. |
+| `GET /model` | Backbone, checkpoint name, threshold and where the threshold came from. |
+| `POST /predict` | Upload a JPEG or PNG. Optional `explain=true` adds a Grad-CAM overlay (base64 PNG), `threshold=0.4` overrides the decision threshold for that call. |
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `CXR_CHECKPOINT` | `outputs/models/best.pt` | Trained weights. If the file is missing the server starts, `/health` says `model_loaded: false` and `/predict` returns 503. A corrupt file stops the server instead. |
+| `CXR_THRESHOLD` | from the checkpoint, else 0.5 | Decision threshold. `/model` reports its source. |
+| `CXR_API_KEY` | unset | If set, `/model` and `/predict` need an `X-API-Key` header. |
+| `CXR_MAX_UPLOAD_MB` | 10 | Larger uploads get 413. |
+| `CXR_DEVICE` | `cpu` | `cuda` if available. |
+
+Safety choices: the checkpoint is loaded with `weights_only=True` (no arbitrary code from a pickle), only JPEG and PNG are accepted, image size is capped against decompression bombs, 16-bit X-rays are rescaled rather than clipped, and requests take turns on the model because Grad-CAM changes its gradient state. The tests use a randomly initialised model, so they check the plumbing, not accuracy.
+
 ## Tests
 
 ```bash
 pip install -r requirements-dev.txt
+ruff check api tests/test_api.py && mypy
 pytest -q
 ```
 Tests cover patient-id parsing, patient-level split (no leakage, proportions, reproducibility, leak detection), class weights and the metric functions.
