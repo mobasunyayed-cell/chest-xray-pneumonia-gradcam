@@ -22,3 +22,47 @@ jobs:
       - run: ruff format --check api tests/test_api.py
       - run: mypy
       - run: pytest -q
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the image
+        run: docker build -t cxr-api .
+      - name: The image is not running as root
+        run: test "$(docker run --rm --entrypoint id cxr-api -u)" != "0"
+      - name: Without weights the server starts and refuses predictions
+        run: |
+          docker run -d --name bare -p 8001:8000 cxr-api
+          for i in $(seq 1 40); do curl -fs localhost:8001/health && break || sleep 2; done
+          curl -fs localhost:8001/health | grep -q '"model_loaded":false'
+          test "$(curl -s -o /dev/null -w '%{http_code}' -F file=@README.md localhost:8001/predict)" = 503
+          docker rm -f bare
+      - name: Create random weights and a test image with the image itself
+        run: |
+          mkdir -p outputs/models && chmod 777 outputs/models
+          docker run --rm -v "$PWD/outputs/models:/models" --entrypoint python cxr-api -c "
+          import torch
+          from PIL import Image
+          from src.model import build_model
+          torch.save({'model': build_model(pretrained=False).state_dict()}, '/models/best.pt')
+          Image.new('L', (64, 64), 128).save('/models/sample.png')"
+      - name: Start with Docker Compose and call the real endpoint
+        run: |
+          docker compose up -d --build
+          for i in $(seq 1 40); do curl -fs localhost:8000/health && break || sleep 2; done
+          curl -fs localhost:8000/health | grep -q '"model_loaded":true'
+          curl -fs -F file=@outputs/models/sample.png "localhost:8000/predict?explain=true" | tee out.json
+          python3 -c "
+          import json
+          body = json.load(open('out.json'))
+          assert body['label'] in ('NORMAL', 'PNEUMONIA'), body
+          assert 0 <= body['probability'] <= 1, body
+          assert body['heatmap_png_base64'], 'no heatmap'
+          print('predict OK')"
+      - name: Show logs on failure
+        if: failure()
+        run: docker compose logs
+      - name: Stop
+        if: always()
+        run: docker compose down -v

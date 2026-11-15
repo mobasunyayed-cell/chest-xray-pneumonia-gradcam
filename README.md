@@ -110,6 +110,16 @@ curl -F "file=@xray.jpg" "http://localhost:8000/predict?explain=true"
 
 Safety choices: the checkpoint is loaded with `weights_only=True` (no arbitrary code from a pickle), only JPEG and PNG are accepted, image size is capped against decompression bombs, 16-bit X-rays are rescaled rather than clipped, and requests take turns on the model because Grad-CAM changes its gradient state. The tests use a randomly initialised model, so they check the plumbing, not accuracy.
 
+### Docker
+
+```bash
+# put your trained weights at outputs/models/best.pt first
+docker compose up --build
+curl -F "file=@xray.jpg" "http://localhost:8000/predict?explain=true"
+```
+
+The image uses the CPU build of PyTorch, runs as a non-root user with a read-only file system, and does not contain the weights: they are mounted from `outputs/models/`. `CXR_THRESHOLD` defaults to 0.2901 in `docker-compose.yml`, the value chosen on the validation set for the weights reported above. If you retrain, change it. CI builds the image, starts it with and without weights, and calls `/predict` with randomly initialised weights to prove the whole path works.
+
 ## Tests
 
 ```bash

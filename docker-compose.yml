@@ -1,0 +1,21 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      # The trained weights are not in the repository. Put best.pt in outputs/models/.
+      - ./outputs/models:/models:ro
+    environment:
+      # Threshold chosen on the validation set for the weights in the README results.
+      # Change it if you retrain.
+      CXR_THRESHOLD: ${CXR_THRESHOLD:-0.2901}
+      # Set CXR_API_KEY in a .env file to require an X-API-Key header.
+      CXR_API_KEY: ${CXR_API_KEY:-}
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
