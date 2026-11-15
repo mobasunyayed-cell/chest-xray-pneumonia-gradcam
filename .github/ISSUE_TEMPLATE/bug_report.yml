@@ -1,0 +1,24 @@
+name: Bug report
+description: Something does not work as documented
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: Include the exact command and the full error message.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: How you run it (Docker or uvicorn) and the commit or release
+      placeholder: "Docker, release v0.1.0"
+    validations:
+      required: true
