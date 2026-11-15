@@ -122,6 +122,19 @@ curl -F "file=@xray.jpg" "http://localhost:8000/predict?explain=true"
 
 The image uses the CPU build of PyTorch, runs as a non-root user with a read-only file system, and does not contain the weights: they are mounted from `outputs/models/`. `CXR_THRESHOLD` defaults to 0.2901 in `docker-compose.yml`, the value chosen on the validation set for the weights reported above. If you retrain, change it. CI builds the image, starts it with and without weights, and calls `/predict` with randomly initialised weights to prove the whole path works.
 
+### Quick start on Kaggle (no copy-pasting of source files)
+
+With the dataset attached, GPU on and Internet on, one cell runs everything:
+
+```
+!git clone -q https://github.com/mobasunyayed-cell/chest-xray-pneumonia-gradcam.git repo
+%cd repo
+!python -m src.data && python -m src.train && python -m src.gradcam && python -m src.shortcut_check
+!zip -rq /kaggle/working/results.zip outputs/models/best.pt outputs/figures
+```
+
+Download `results.zip` from the Output panel. `best.pt` already contains the validation-chosen threshold, so the API needs no `CXR_THRESHOLD`.
+
 ## Tests
 
 ```bash
