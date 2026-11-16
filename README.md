@@ -118,6 +118,19 @@ curl -F "file=@xray.jpg" "http://localhost:8000/predict?explain=true"
 
 Safety choices: the checkpoint is loaded with `weights_only=True` (no arbitrary code from a pickle), only JPEG and PNG are accepted, image size is capped against decompression bombs, 16-bit X-rays are rescaled rather than clipped, and requests take turns on the model because Grad-CAM changes its gradient state. The tests use a randomly initialised model, so they check the plumbing, not accuracy.
 
+### Trained weights
+
+The weights from the run reported above (DenseNet121, 28 MB, threshold stored inside) are attached to the [v0.2.0 release](https://github.com/mobasunyayed-cell/chest-xray-pneumonia-gradcam/releases/tag/v0.2.0):
+
+```bash
+mkdir -p outputs/models
+curl -L -o outputs/models/best.pt \
+  https://github.com/mobasunyayed-cell/chest-xray-pneumonia-gradcam/releases/download/v0.2.0/best.pt
+echo "46cd18cd76b6ed38c46a01e13578b89db4214f218b6b4b6454039697e9df73fe  outputs/models/best.pt" | sha256sum -c
+```
+
+Then start the API or Docker as described here. The weights were trained on pediatric chest X-rays only; read the limitations before using them for anything.
+
 ### Docker
 
 ```bash
